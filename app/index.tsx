@@ -1,9 +1,9 @@
-import { View, Text } from 'react-native';
+import { Redirect } from 'expo-router';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-  return (
-    <View>
-      <Text className='text-lg font-bold text-red-500'>Hello World</Text>
-    </View>
-  );
+  const [isOnboarding, setIsOnboarding] = useState(true);
+  useEffect(() => {}, []);
+
+  return <Redirect href={'/(onboarding)'} />;
 }
