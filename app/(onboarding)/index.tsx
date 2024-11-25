@@ -5,6 +5,7 @@ import Onboarding1 from '../../assets/svgs/onboarding1';
 
 export default function OnboardingScreen() {
   const { height } = useWindowDimensions();
+
   return (
     <LinearGradient
       colors={['#250252', '#000000']}
@@ -22,7 +23,6 @@ export default function OnboardingScreen() {
     >
       <StatusBar style='light' />
       <Onboarding1 />
-      <Text></Text>
     </LinearGradient>
   );
 }
