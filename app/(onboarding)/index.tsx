@@ -1,10 +1,29 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, useWindowDimensions } from 'react-native';
-import Onboarding1 from '../../assets/svgs/onboarding1';
+import {
+  View,
+  Text,
+  useWindowDimensions,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
+import { onBoardingDataType } from '../../constants/global';
+import { onBoardingData } from '../../constants/constants';
+import { useRef, useState } from 'react';
 
 export default function OnboardingScreen() {
-  const { height } = useWindowDimensions();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { height, width } = useWindowDimensions();
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const contentOffSetX = event.nativeEvent.contentOffset.x;
+    const currentIndex = Math.round(
+      contentOffSetX / event.nativeEvent.layoutMeasurement.width
+    );
+    setActiveIndex(currentIndex);
+  };
 
   return (
     <LinearGradient
@@ -22,7 +41,24 @@ export default function OnboardingScreen() {
       }}
     >
       <StatusBar style='light' />
-      <Onboarding1 />
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+      >
+        {onBoardingData.map((item: onBoardingDataType, index: number) => (
+          <View
+            key={index}
+            style={{
+              width: width,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {item.image}
+          </View>
+        ))}
+      </ScrollView>
     </LinearGradient>
   );
 }
