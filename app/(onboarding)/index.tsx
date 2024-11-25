@@ -56,6 +56,14 @@ export default function OnboardingScreen() {
             }}
           >
             {item.image}
+            <View className='p-3 gap-8'>
+              <Text className='text-white text-center font-extrabold text-3xl'>
+                {item.title}
+              </Text>
+              <Text className='text-gray-300  text-2xl text-center'>
+                {item.subtitle}
+              </Text>
+            </View>
           </View>
         ))}
       </ScrollView>
