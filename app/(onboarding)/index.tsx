@@ -54,7 +54,7 @@ export default function OnboardingScreen() {
             right: scale(20),
             zIndex: 10,
           }}
-          onPress={() => console.log('Pressed skip')}
+          onPress={() => router.push('./home')}
         >
           <Text className='text-white text-lg font-bold'>Skip</Text>
         </Pressable>
