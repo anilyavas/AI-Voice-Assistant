@@ -14,6 +14,7 @@ import { onBoardingData } from '../../constants/constants';
 import { useRef, useState } from 'react';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { router, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OnboardingScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -30,10 +31,15 @@ export default function OnboardingScreen() {
     }
   };
 
+  const handleSkip = async () => {
+    await AsyncStorage.setItem('onboarding', 'true');
+    router.push('./home');
+  };
+
   return (
     <View className='flex-1'>
       <LinearGradient
-        colors={['#000000', '#097943', '#00d4ff']}
+        colors={['#000000', '#097943', '#ffa200']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
@@ -54,7 +60,7 @@ export default function OnboardingScreen() {
             right: scale(20),
             zIndex: 10,
           }}
-          onPress={() => router.push('./home')}
+          onPress={handleSkip}
         >
           <Text className='text-white text-lg font-bold'>Skip</Text>
         </Pressable>
