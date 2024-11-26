@@ -7,11 +7,13 @@ import {
   ScrollView,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Pressable,
 } from 'react-native';
 import { onBoardingDataType } from '../../constants/global';
 import { onBoardingData } from '../../constants/constants';
 import { useRef, useState } from 'react';
 import { scale, verticalScale } from 'react-native-size-matters';
+import { AntDesign } from '@expo/vector-icons';
 
 export default function OnboardingScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -28,7 +30,7 @@ export default function OnboardingScreen() {
 
   return (
     <LinearGradient
-      colors={['#250252', '#000000']}
+      colors={['#000000', '#097943', '#00d4ff']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={{
@@ -42,11 +44,25 @@ export default function OnboardingScreen() {
       }}
     >
       <StatusBar style='light' />
+      <Pressable
+        style={{
+          position: 'absolute',
+          top: verticalScale(45),
+          right: scale(30),
+          flexDirection: 'row',
+          gap: 10,
+          alignItems: 'center',
+        }}
+      >
+        <Text className='font-bold text-white text-lg'>Skip</Text>
+        <AntDesign name='arrowright' size={20} color={'white'} />
+      </Pressable>
       <ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
+        ref={scrollViewRef}
       >
         {onBoardingData.map((item: onBoardingDataType, index: number) => (
           <View
