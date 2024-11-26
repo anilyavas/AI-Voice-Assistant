@@ -8,12 +8,14 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   Pressable,
+  Dimensions,
 } from 'react-native';
 import { onBoardingDataType } from '../../constants/global';
 import { onBoardingData } from '../../constants/constants';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { AntDesign } from '@expo/vector-icons';
+import { Link, router } from 'expo-router';
 
 export default function OnboardingScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -25,7 +27,9 @@ export default function OnboardingScreen() {
     const currentIndex = Math.round(
       contentOffSetX / event.nativeEvent.layoutMeasurement.width
     );
-    setActiveIndex(currentIndex);
+    if (currentIndex !== activeIndex) {
+      setActiveIndex(currentIndex);
+    }
   };
 
   return (
@@ -44,19 +48,21 @@ export default function OnboardingScreen() {
       }}
     >
       <StatusBar style='light' />
-      <Pressable
-        style={{
-          position: 'absolute',
-          top: verticalScale(45),
-          right: scale(30),
-          flexDirection: 'row',
-          gap: 10,
-          alignItems: 'center',
-        }}
-      >
-        <Text className='font-bold text-white text-lg'>Skip</Text>
-        <AntDesign name='arrowright' size={20} color={'white'} />
-      </Pressable>
+      <Link asChild href={'./'}>
+        <Pressable
+          style={{
+            position: 'absolute',
+            top: verticalScale(45),
+            right: scale(30),
+            flexDirection: 'row',
+            gap: 10,
+            alignItems: 'center',
+          }}
+        >
+          <Text className='font-bold text-white text-lg'>Skip</Text>
+          <AntDesign name='arrowright' size={20} color={'white'} />
+        </Pressable>
+      </Link>
       <ScrollView
         horizontal
         pagingEnabled
