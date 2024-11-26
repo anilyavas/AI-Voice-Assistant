@@ -6,7 +6,7 @@ import { onBoardingDataType } from './global';
 export const onBoardingData: onBoardingDataType[] = [
   {
     id: 1,
-    title: 'Meet Your AI Companion',
+    title: 'Meet with Your AI Companion',
     subtitle:
       'Discover the future of communication and knowledge through interactive AI conversations.',
     image: <Onboarding1 />,
@@ -20,7 +20,7 @@ export const onBoardingData: onBoardingDataType[] = [
   },
   {
     id: 3,
-    title: 'Explore your life',
+    title: 'Explore Your Life',
     subtitle:
       'Tailor the AI experience to fit your unique needs and get personalized responses anytime.',
     image: <Onboarding3 />,

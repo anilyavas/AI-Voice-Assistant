@@ -11,6 +11,7 @@ import {
 import { onBoardingDataType } from '../../constants/global';
 import { onBoardingData } from '../../constants/constants';
 import { useRef, useState } from 'react';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 export default function OnboardingScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -45,6 +46,7 @@ export default function OnboardingScreen() {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
+        onScroll={handleScroll}
       >
         {onBoardingData.map((item: onBoardingDataType, index: number) => (
           <View
@@ -67,6 +69,32 @@ export default function OnboardingScreen() {
           </View>
         ))}
       </ScrollView>
+      <View
+        style={{
+          bottom: verticalScale(70),
+          position: 'absolute',
+          gap: scale(8),
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+        }}
+      >
+        {onBoardingData.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              {
+                width: scale(8),
+                height: scale(8),
+                borderRadius: 1000,
+                backgroundColor: '#fff',
+                marginHorizontal: scale(2),
+              },
+              { opacity: activeIndex === index ? 1 : 0.3 },
+            ]}
+          />
+        ))}
+      </View>
     </LinearGradient>
   );
 }
