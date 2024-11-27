@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { View, useWindowDimensions, Text } from 'react-native';
+import { View, useWindowDimensions } from 'react-native';
 import { useState } from 'react';
 import { Audio } from 'expo-av';
 import LottieView from 'lottie-react-native';
