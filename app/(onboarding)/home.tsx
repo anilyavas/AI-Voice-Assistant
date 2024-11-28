@@ -12,6 +12,7 @@ import LottieView from 'lottie-react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { setAudioModeAsync } from 'expo-av/build/Audio';
+import axios from 'axios';
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -84,7 +85,37 @@ export default function Home() {
       });
       const uri = await recording?.getURI();
       //send it to whisper api
-    } catch (error) {}
+      const transcript = await sendAudioToWhisper(uri);
+      setText(transcript);
+    } catch (error) {
+      console.log('Failed to stop recording', error);
+      Alert.alert('Error', 'Failed to stop recording');
+    }
+  };
+
+  const sendAudioToWhisper = async (uri: string) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', {
+        uri,
+        type: 'audio/wav',
+        name: 'recording.wav',
+      });
+      formData.append('model', 'whisper-1');
+      const response = await axios.post(
+        'https://api.openai.com/v1/audio/transcriptions',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.data.text;
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <View className='flex-1'>
