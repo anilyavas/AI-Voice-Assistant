@@ -1,17 +1,79 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, View, useWindowDimensions, Text } from 'react-native';
+import {
+  Pressable,
+  View,
+  useWindowDimensions,
+  Text,
+  Alert,
+} from 'react-native';
 import { useState } from 'react';
 import { Audio } from 'expo-av';
 import LottieView from 'lottie-react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { scale, verticalScale } from 'react-native-size-matters';
+import { setAudioModeAsync } from 'expo-av/build/Audio';
 
 export default function Home() {
+  const [text, setText] = useState('');
   const { height, width } = useWindowDimensions();
   const [isRecording, setIsRecording] = useState(false);
   const [loading, isLoading] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording>();
   const [response, setResponse] = useState(false);
+
+  const getMicrophonePermission = async () => {
+    try {
+      const { granted } = await Audio.getPermissionsAsync();
+
+      if (!granted) {
+        Alert.alert(
+          'Permission denied, Please grant permission to access the microphone'
+        );
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  };
+
+  const recordingOptions: any = {
+    android: {
+      extension: '.wav',
+      outPutFormat: Audio.AndroidOutputFormat.MPEG_4,
+      androidEncoder: Audio.AndroidAudioEncoder.AAC,
+      sampleRate: 44100,
+      numberOfChannels: 2,
+      bitRate: 128000,
+    },
+    ios: {
+      extension: '.wav',
+      audioQuality: Audio.IOSAudioQuality.HIGH,
+      sampleRate: 44100,
+      numberOfChannels: 2,
+      bitRate: 128000,
+      linearPCMBitDepth: 16,
+      linearPCMIsBigEndian: false,
+      linearPCMIsFloat: false,
+    },
+  };
+
+  const startRecording = async () => {
+    const hasPermission = await getMicrophonePermission();
+    if (!hasPermission) return;
+    try {
+      await setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+      const { recording } = await Audio.Recording.createAsync(recordingOptions);
+      setRecording(recording);
+    } catch (error) {
+      console.log('Failed to start recording', error);
+      Alert.alert('Error', 'Failed to start recording');
+    }
+  };
   return (
     <View className='flex-1'>
       <LinearGradient
@@ -30,6 +92,7 @@ export default function Home() {
       >
         <View style={{ marginTop: verticalScale(-40) }}>
           <Pressable
+            onPress={startRecording}
             style={{
               width: scale(110),
               height: scale(110),
