@@ -74,6 +74,18 @@ export default function Home() {
       Alert.alert('Error', 'Failed to start recording');
     }
   };
+  const stopRecording = async () => {
+    try {
+      setIsRecording(false);
+      isLoading(true);
+      await recording?.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+      });
+      const uri = await recording?.getURI();
+      //send it to whisper api
+    } catch (error) {}
+  };
   return (
     <View className='flex-1'>
       <LinearGradient
