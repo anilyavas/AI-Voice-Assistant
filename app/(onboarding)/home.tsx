@@ -1,8 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { View, useWindowDimensions } from 'react-native';
+import { Pressable, View, useWindowDimensions, Text } from 'react-native';
 import { useState } from 'react';
 import { Audio } from 'expo-av';
 import LottieView from 'lottie-react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { scale, verticalScale } from 'react-native-size-matters';
 
 export default function Home() {
   const { height, width } = useWindowDimensions();
@@ -26,7 +28,41 @@ export default function Home() {
           flex: 1,
         }}
       >
-        <LottieView
+        <View style={{ marginTop: verticalScale(-40) }}>
+          <Pressable
+            style={{
+              width: scale(110),
+              height: scale(110),
+              alignItems: 'center',
+              backgroundColor: '#fff',
+              justifyContent: 'center',
+              borderRadius: scale(100),
+            }}
+          >
+            <FontAwesome name='microphone' size={scale(50)} color={'#2b3356'} />
+          </Pressable>
+        </View>
+        <View
+          style={{
+            alignItems: 'center',
+            position: 'absolute',
+            width: scale(350),
+            bottom: verticalScale(90),
+          }}
+        >
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: scale(16),
+              width: scale(269),
+              textAlign: 'center',
+              lineHeight: 25,
+            }}
+          >
+            Press the microphone to start recording!
+          </Text>
+        </View>
+        {/* <LottieView
           source={
             isRecording
               ? require('../../assets/lottie/voice.json')
@@ -34,7 +70,7 @@ export default function Home() {
           }
           style={{ width: '100%', height: '100%' }}
           loop
-        />
+        />*/}
       </LinearGradient>
     </View>
   );
