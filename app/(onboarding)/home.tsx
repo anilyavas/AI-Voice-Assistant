@@ -9,7 +9,6 @@ import {
 import { useState } from 'react';
 import { Audio } from 'expo-av';
 import LottieView from 'lottie-react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { setAudioModeAsync } from 'expo-av/build/Audio';
 import axios from 'axios';
@@ -18,17 +17,18 @@ export default function Home() {
   const [text, setText] = useState('');
   const { height, width } = useWindowDimensions();
   const [isRecording, setIsRecording] = useState(false);
-  const [loading, isLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording>();
   const [response, setResponse] = useState(false);
 
   const getMicrophonePermission = async () => {
     try {
-      const { granted } = await Audio.getPermissionsAsync();
+      const { granted } = await Audio.requestPermissionsAsync();
 
       if (!granted) {
         Alert.alert(
-          'Permission denied, Please grant permission to access the microphone'
+          'Permission',
+          'Please grant permission to access microphone'
         );
         return false;
       }
@@ -64,44 +64,51 @@ export default function Home() {
     const hasPermission = await getMicrophonePermission();
     if (!hasPermission) return;
     try {
-      await setAudioModeAsync({
+      await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
+      setIsRecording(true);
       const { recording } = await Audio.Recording.createAsync(recordingOptions);
       setRecording(recording);
     } catch (error) {
-      console.log('Failed to start recording', error);
+      console.log('Failed to start Recording', error);
       Alert.alert('Error', 'Failed to start recording');
     }
   };
+
   const stopRecording = async () => {
     try {
       setIsRecording(false);
-      isLoading(true);
+      setLoading(true);
       await recording?.stopAndUnloadAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
       });
-      const uri = await recording?.getURI();
-      //send it to whisper api
-      const transcript = await sendAudioToWhisper(uri);
+
+      const uri = recording?.getURI();
+
+      const transcript = await sendAudioToWhisper(uri!);
+
       setText(transcript);
+
+      await sendToGpt(transcript);
     } catch (error) {
-      console.log('Failed to stop recording', error);
+      console.log('Failed to stop Recording', error);
       Alert.alert('Error', 'Failed to stop recording');
     }
   };
 
   const sendAudioToWhisper = async (uri: string) => {
     try {
-      const formData = new FormData();
+      const formData: any = new FormData();
       formData.append('file', {
         uri,
         type: 'audio/wav',
         name: 'recording.wav',
       });
       formData.append('model', 'whisper-1');
+
       const response = await axios.post(
         'https://api.openai.com/v1/audio/transcriptions',
         formData,
@@ -117,6 +124,8 @@ export default function Home() {
       console.log(error);
     }
   };
+
+  const sendToGpt = async () => {};
   return (
     <View className='flex-1'>
       <LinearGradient
@@ -134,19 +143,43 @@ export default function Home() {
         }}
       >
         <View style={{ marginTop: verticalScale(-40) }}>
-          <Pressable
-            onPress={startRecording}
-            style={{
-              width: scale(110),
-              height: scale(110),
-              alignItems: 'center',
-              backgroundColor: '#fff',
-              justifyContent: 'center',
-              borderRadius: scale(100),
-            }}
-          >
-            <FontAwesome name='microphone' size={scale(50)} color={'#2b3356'} />
-          </Pressable>
+          {!isRecording ? (
+            <Pressable
+              onPress={startRecording}
+              style={{
+                width: scale(110),
+                height: scale(110),
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: scale(100),
+              }}
+            >
+              <LottieView
+                source={require('../../assets/lottie/mic.json')}
+                style={{ width: scale(250), height: scale(250) }}
+                loop
+                speed={1.3}
+              />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={stopRecording}
+              style={{
+                width: scale(110),
+                height: scale(110),
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: scale(100),
+              }}
+            >
+              <LottieView
+                source={require('../../assets/lottie/voice.json')}
+                style={{ width: scale(250), height: scale(250) }}
+                loop
+                speed={1.3}
+              />
+            </Pressable>
+          )}
         </View>
         <View
           style={{
@@ -165,7 +198,9 @@ export default function Home() {
               lineHeight: 25,
             }}
           >
-            Press the microphone to start recording!
+            {loading
+              ? '...'
+              : text || 'Press the microphone to start recording!'}
           </Text>
         </View>
         {/* <LottieView

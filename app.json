@@ -27,10 +27,12 @@
     },
     "plugins": [
       "expo-router",
-      "expo-av",
-      {
-        "microphonePermission": "Allow Voice Assistant to access your microphone"
-      }
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow AI Assistant to access your microphone."
+        }
+      ]
     ]
   }
 }
