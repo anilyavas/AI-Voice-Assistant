@@ -6,7 +6,7 @@ import {
   Text,
   Alert,
 } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Audio } from 'expo-av';
 import LottieView from 'lottie-react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
@@ -21,6 +21,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording>();
   const [AIResponse, setAIResponse] = useState(false);
+  const [AISpeaking, setAISpeaking] = useState(false);
+  const lottieRef = useRef<LottieView>(null);
 
   const getMicrophonePermission = async () => {
     try {
@@ -93,8 +95,7 @@ export default function Home() {
 
       setText(transcript);
 
-      const gptResponse = await sendToGpt(transcript);
-      setAIResponse(true);
+      await sendToGpt(transcript);
     } catch (error) {
       console.log('Failed to stop Recording', error);
       Alert.alert('Error', 'Failed to stop recording');
@@ -154,6 +155,8 @@ export default function Home() {
       );
       setText(response.data.choices[0].message.content);
       setLoading(false);
+      setAIResponse(true);
+      await speechToText(response.data.choices[0].message.content);
       return response.data.choices[0].message.content;
     } catch (error) {
       console.log('Error sending text to GPT-4', error);
@@ -161,14 +164,24 @@ export default function Home() {
   };
 
   const speechToText = async (text: string) => {
+    setAISpeaking(true);
     const options = {
       voice: 'com.apple.ttsbundle.Samantha-compact',
       labguage: 'en-US',
       pitch: 1.5,
       rate: 1,
+      onDone: () => setAISpeaking(false),
     };
     Speech.speak(text, options);
   };
+
+  useEffect(() => {
+    if (AISpeaking) {
+      lottieRef.current?.play();
+    } else {
+      lottieRef.current?.reset();
+    }
+  }, [AISpeaking]);
 
   return (
     <View className='flex-1'>
@@ -261,15 +274,6 @@ export default function Home() {
               : text || 'Press the microphone to start recording!'}
           </Text>
         </View>
-        {/* <LottieView
-          source={
-            isRecording
-              ? require('../../assets/lottie/voice.json')
-              : require('../../assets/lottie/mic.json')
-          }
-          style={{ width: '100%', height: '100%' }}
-          loop
-        />*/}
       </LinearGradient>
     </View>
   );
