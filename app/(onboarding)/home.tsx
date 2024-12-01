@@ -125,7 +125,38 @@ export default function Home() {
     }
   };
 
-  const sendToGpt = async () => {};
+  const sendToGpt = async (text: string) => {
+    try {
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are an AI Assistant, a friendly AI assistant who responds naturally and refers to yourself as Assistant when asked for your name. You are a hepful assistant who can answer questions and help with tasks.',
+            },
+            {
+              role: 'user',
+              content: text,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      setText(response.data.choices[0].message.content);
+      setLoading(false);
+      return response.data.choices[0].message.content;
+    } catch (error) {
+      console.log('Error sending text to GPT-4', error);
+    }
+  };
   return (
     <View className='flex-1'>
       <LinearGradient
@@ -143,42 +174,56 @@ export default function Home() {
         }}
       >
         <View style={{ marginTop: verticalScale(-40) }}>
-          {!isRecording ? (
-            <Pressable
-              onPress={startRecording}
-              style={{
-                width: scale(110),
-                height: scale(110),
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: scale(100),
-              }}
-            >
+          {loading ? (
+            <Pressable>
               <LottieView
-                source={require('../../assets/lottie/mic.json')}
+                source={require('../../assets/lottie/loading.json')}
                 style={{ width: scale(250), height: scale(250) }}
+                autoPlay
                 loop
                 speed={1.3}
               />
             </Pressable>
           ) : (
-            <Pressable
-              onPress={stopRecording}
-              style={{
-                width: scale(110),
-                height: scale(110),
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: scale(100),
-              }}
-            >
-              <LottieView
-                source={require('../../assets/lottie/voice.json')}
-                style={{ width: scale(250), height: scale(250) }}
-                loop
-                speed={1.3}
-              />
-            </Pressable>
+            <>
+              {!isRecording ? (
+                <Pressable
+                  onPress={startRecording}
+                  style={{
+                    width: scale(110),
+                    height: scale(110),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: scale(100),
+                  }}
+                >
+                  <LottieView
+                    source={require('../../assets/lottie/mic.json')}
+                    style={{ width: scale(250), height: scale(250) }}
+                    loop
+                    speed={1.3}
+                  />
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={stopRecording}
+                  style={{
+                    width: scale(110),
+                    height: scale(110),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: scale(100),
+                  }}
+                >
+                  <LottieView
+                    source={require('../../assets/lottie/voice.json')}
+                    style={{ width: scale(250), height: scale(250) }}
+                    loop
+                    speed={1.3}
+                  />
+                </Pressable>
+              )}
+            </>
           )}
         </View>
         <View
