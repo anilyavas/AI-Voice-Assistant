@@ -12,6 +12,7 @@ import LottieView from 'lottie-react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { setAudioModeAsync } from 'expo-av/build/Audio';
 import axios from 'axios';
+import * as Speech from 'expo-speech';
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -19,7 +20,7 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState<Audio.Recording>();
-  const [response, setResponse] = useState(false);
+  const [AIResponse, setAIResponse] = useState(false);
 
   const getMicrophonePermission = async () => {
     try {
@@ -92,7 +93,8 @@ export default function Home() {
 
       setText(transcript);
 
-      await sendToGpt(transcript);
+      const gptResponse = await sendToGpt(transcript);
+      setAIResponse(true);
     } catch (error) {
       console.log('Failed to stop Recording', error);
       Alert.alert('Error', 'Failed to stop recording');
@@ -157,6 +159,17 @@ export default function Home() {
       console.log('Error sending text to GPT-4', error);
     }
   };
+
+  const speechToText = async (text: string) => {
+    const options = {
+      voice: 'com.apple.ttsbundle.Samantha-compact',
+      labguage: 'en-US',
+      pitch: 1.5,
+      rate: 1,
+    };
+    Speech.speak(text, options);
+  };
+
   return (
     <View className='flex-1'>
       <LinearGradient
@@ -175,7 +188,7 @@ export default function Home() {
       >
         <View style={{ marginTop: verticalScale(-40) }}>
           {loading ? (
-            <Pressable>
+            <Pressable onPress={() => speechToText(text)}>
               <LottieView
                 source={require('../../assets/lottie/loading.json')}
                 style={{ width: scale(250), height: scale(250) }}
